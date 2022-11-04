@@ -25,11 +25,13 @@ func GetClient() (*spotify.Client, error) {
   
    t, err := os.ReadFile("refresh.token")
    if err != nil {
-      return nil, fmt.Errorf("File 'refresh.token' does not exist. Either set this if you have an oauth2 refresh token or execute the 'spotify-scraper auth' command.")
+     fmt.Println("refresh.token file not set. Checking 'SPOTIFY_REFRESH_TOKEN' environment variable")
    }
 
    token := new(oauth2.Token)
    token.Expiry = time.Now().Add(time.Second * -5)
+
+   fmt.Println(string(t))
    token.RefreshToken = string(t)
 
    // use the token to get an authenticated client
