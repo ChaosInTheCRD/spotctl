@@ -23,6 +23,7 @@ var (
 func GetClient() (*spotify.Client, error) {
    ctx := context.TODO()
   
+   fmt.Println("Reading Token")
    t, err := os.ReadFile("refresh.token")
    if err != nil {
      fmt.Println("refresh.token file not set. Checking 'SPOTIFY_REFRESH_TOKEN' environment variable")
@@ -43,7 +44,8 @@ func GetClient() (*spotify.Client, error) {
       return nil, err
    }
 
-   err = os.WriteFile("refresh.token", []byte(newToken.RefreshToken), 0644)
+   fmt.Println("Writing Token")
+   err = os.WriteFile("refresh.token", []byte(newToken.RefreshToken), 0777)
    if err != nil {
       return nil, err
    }
