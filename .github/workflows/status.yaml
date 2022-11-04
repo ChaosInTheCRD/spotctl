@@ -33,4 +33,4 @@ jobs:
           name: 'REFRESH_TOKEN'
           value: "${{ steps.refreshtoken.outputs.REFRESH_TOKEN }}"
           repository: hmanzur/actions-set-secret
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
