@@ -1,2 +1,2 @@
-refresh.token filter=git-crypt diff=git-crypt
+*.token filter=git-crypt diff=git-crypt
 
