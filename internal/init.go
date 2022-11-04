@@ -24,10 +24,7 @@ func GetClient() (*spotify.Client, error) {
    ctx := context.TODO()
   
    fmt.Println("Reading Token")
-   t, err := os.ReadFile("refresh.token")
-   if err != nil {
-     fmt.Println("refresh.token file not set. Checking 'SPOTIFY_REFRESH_TOKEN' environment variable")
-   }
+   t := os.Getenv("REFRESH_TOKEN")
 
    token := new(oauth2.Token)
    token.Expiry = time.Now().Add(time.Second * -5)
@@ -45,10 +42,7 @@ func GetClient() (*spotify.Client, error) {
    }
 
    fmt.Println("Writing Token")
-   err = os.WriteFile("refresh.token", []byte(newToken.RefreshToken), 0777)
-   if err != nil {
-      return nil, err
-   }
+   os.Setenv("REFRESH_TOKEN", newToken.RefreshToken)
 
    return client, nil
 }

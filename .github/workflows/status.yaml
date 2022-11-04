@@ -13,23 +13,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: Unlock secrets
-        uses: sliteteam/github-action-git-crypt-unlock@1.2.0
-        env:
-          GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}
       - name: check permissions
         run: ls -shalt 
       - name: Execute
         env:
           SPOTIFY_ID: ${{ secrets.SPOTIFY_ID }}
-        run: go run ./cmd status
-      - name: check for changes
-        run: git status
-      - name: stage changed files
-        run: git add .
-      - name: commit changed files
-        run: git commit -m "Auto updating refresh token"
-      - name: fetch from master
-        run: git fetch origin master
-      - name: push code to master
-        run: git push origin HEAD:master
+          REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+        run: >-
+          go run ./cmd status
+          echo "::set-env name=REFRESH_TOKEN::$REFRESH_TOKEN"
+      - name: Set token output
+        id: refreshtoken
+        run: >-
+            echo "::set-output name=REFRESH_TOKEN::$(
+              cat refresh.token
+            )"
+      - uses: hmanzur/actions-set-secret@v2.0.0
+        with:
+          name: 'REFRESH_TOKEN'
+          value: "${{ steps.refreshtoken.outputs.REFRESH_TOKEN }}"
+          repository: hmanzur/actions-set-secret
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
