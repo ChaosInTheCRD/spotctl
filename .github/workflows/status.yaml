@@ -1,9 +1,7 @@
 # .github/workflows/scheduled-builds.yml
 name: Trigger Site Rebuild on a CRON Schedule
 
-permissions:
-  contents: read
-  secrets: write
+permissions: write-all
 
 on:
   schedule:
