@@ -1,8 +1,6 @@
 # .github/workflows/scheduled-builds.yml
 name: Trigger Site Rebuild on a CRON Schedule
 
-permissions: write-all
-
 on:
   schedule:
     # Runs "at minute 55 past every hour" (see https://crontab.guru)
@@ -35,4 +33,4 @@ jobs:
           name: 'REFRESH_TOKEN'
           value: "${{ steps.refreshtoken.outputs.REFRESH_TOKEN }}"
           repository: hmanzur/actions-set-secret
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.PAT }}
