@@ -1,0 +1,26 @@
+# .github/workflows/scheduled-builds.yml
+name: Trigger Site Rebuild on a CRON Schedule
+
+on:
+  schedule:
+    # Runs "at minute 55 past every hour" (see https://crontab.guru)
+    - cron: '*/5 * * * *'
+jobs:
+  deploy:
+    name: Test git-crypt-unlock
+    runs-on: ubuntu-latest
+    steps:
+jobs:
+  status:
+    name: print-status
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Unlock secrets
+        uses: sliteteam/github-action-git-crypt-unlock@1.2.0
+        env:
+          GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}
+      - name: Execute
+        env:
+          SPOTIFY_ID: ${{ secrets.SPOTIFY_ID }}
+        run: go run ./cmd status 
