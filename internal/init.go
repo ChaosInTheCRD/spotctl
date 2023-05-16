@@ -2,8 +2,9 @@ package internal
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"os"
-        "fmt"
 	"os/exec"
 	"runtime"
 	"time"
@@ -16,51 +17,54 @@ import (
 
 const RedirectURI = "http://localhost:8080/callback"
 
-var (
-	Auth  = spotifyauth.New(spotifyauth.WithRedirectURL(RedirectURI), spotifyauth.WithScopes(spotifyauth.ScopeUserReadCurrentlyPlaying, spotifyauth.ScopePlaylistReadPrivate))
-)
+var Auth = spotifyauth.New(spotifyauth.WithRedirectURL(RedirectURI), spotifyauth.WithScopes(spotifyauth.ScopeUserReadCurrentlyPlaying, spotifyauth.ScopePlaylistReadPrivate))
 
-func GetClient() (*spotify.Client, error) {
-   ctx := context.TODO()
-  
-   fmt.Println("Reading Token")
-   t := os.Getenv("REFRESH_TOKEN")
+func GetClient(clientID, clientSecret string) (*spotify.Client, error) {
+	auth := spotifyauth.New(spotifyauth.WithRedirectURL(RedirectURI), spotifyauth.WithClientID(clientID), spotifyauth.WithClientSecret(clientSecret), spotifyauth.WithScopes(spotifyauth.ScopeUserReadCurrentlyPlaying, spotifyauth.ScopePlaylistReadPrivate))
+	ctx := context.TODO()
 
-   token := new(oauth2.Token)
-   token.Expiry = time.Now().Add(time.Second * -5)
+	tByte, err := os.ReadFile("./refresh.token")
+	if err != nil {
+		return nil, errors.Join(err, fmt.Errorf("cannot read refresh token file"))
+	}
 
-   fmt.Println(string(t))
-   token.RefreshToken = string(t)
+	t := string(tByte)
 
-   // use the token to get an authenticated client
-   client := spotify.New(Auth.Client(ctx, token))
+	token := new(oauth2.Token)
+	token.Expiry = time.Now().Add(time.Second * -5)
 
-   // Need to set the new refresh token for the next request
-   newToken, err := client.Token()
-   if err != nil {
-      return nil, err
-   }
+	token.RefreshToken = string(t)
 
-   fmt.Println("Writing Token")
-   os.Setenv("REFRESH_TOKEN", newToken.RefreshToken)
+	// use the token to get an authenticated client
+	client := spotify.New(auth.Client(ctx, token))
 
-   return client, nil
+	// Need to set the new refresh token for the next request
+	newToken, err := client.Token()
+	if err != nil {
+		return nil, err
+	}
+
+	err = os.WriteFile("refresh.token", []byte(newToken.RefreshToken), 0644)
+	if err != nil {
+		return nil, err
+	}
+	return client, nil
 }
 
 // open opens the specified URL in the default browser of the user.
 func Open(url string) error {
-    var cmd string
-    var args []string
+	var cmd string
+	var args []string
 
-    switch runtime.GOOS {
-    case "windows":
-        cmd = "cmd"
-        args = []string{"/c", "start"}
-    case "darwin":
-        cmd = "open"
-    default: // "linux", "freebsd", "openbsd", "netbsd"
-        cmd = "xdg-open"
-    }
-    args = append(args, url)
-    return exec.Command(cmd, args...).Start()
+	switch runtime.GOOS {
+	case "windows":
+		cmd = "cmd"
+		args = []string{"/c", "start"}
+	case "darwin":
+		cmd = "open"
+	default: // "linux", "freebsd", "openbsd", "netbsd"
+		cmd = "xdg-open"
+	}
+	args = append(args, url)
+	return exec.Command(cmd, args...).Start()
 }

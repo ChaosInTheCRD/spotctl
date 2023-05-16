@@ -1,31 +1,35 @@
 package cli
 
 import (
-   "fmt"
-      "context"
-      "github.com/chaosinthecrd/spotify-scraper/internal"
+	"context"
+	"fmt"
+
+	"github.com/chaosinthecrd/spotify-scraper/internal"
 )
 
-func GetCurrentTrack() error {
-   ctx := context.Background()
+type Track struct {
+	Name       string `json:"name"`
+	Artist     string `json:"artist"`
+	PreviewURL string `json:"previewURL"`
+}
 
-   client, err := internal.GetClient()
-   if err != nil {
-      return err
-   }
+func GetCurrentTrack(clientID, clientSecret string) (Track, error) {
+	ctx := context.Background()
 
-   currentlyPlaying, err := client.PlayerCurrentlyPlaying(ctx)
-   if err != nil {
-      return err
-   }
+	client, err := internal.GetClient(clientID, clientSecret)
+	if err != nil {
+		return Track{}, err
+	}
 
-   if !currentlyPlaying.Playing {
-      fmt.Println("null")
-      return nil
-   }
+	currentlyPlaying, err := client.PlayerCurrentlyPlaying(ctx)
+	if err != nil {
+		return Track{}, err
+	}
 
-   fmt.Println("Track: ", currentlyPlaying.Item.Name)
-   fmt.Println("Artist: ", currentlyPlaying.Item.Artists[0].Name)
-   fmt.Println("Preview: ", currentlyPlaying.Item.PreviewURL)
-   return nil
+	if !currentlyPlaying.Playing {
+		fmt.Println("null")
+		return Track{}, err
+	}
+
+	return Track{Name: currentlyPlaying.Item.Name, Artist: currentlyPlaying.Item.Artists[0].Name, PreviewURL: currentlyPlaying.Item.PreviewURL}, nil
 }
