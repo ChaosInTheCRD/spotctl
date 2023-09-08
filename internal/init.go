@@ -19,11 +19,11 @@ const RedirectURI = "http://localhost:8080/callback"
 
 var Auth = spotifyauth.New(spotifyauth.WithRedirectURL(RedirectURI), spotifyauth.WithScopes(spotifyauth.ScopeUserReadCurrentlyPlaying, spotifyauth.ScopePlaylistReadPrivate))
 
-func GetClient(clientID, clientSecret string) (*spotify.Client, error) {
+func GetClient(clientID, clientSecret, refreshToken string) (*spotify.Client, error) {
 	auth := spotifyauth.New(spotifyauth.WithRedirectURL(RedirectURI), spotifyauth.WithClientID(clientID), spotifyauth.WithClientSecret(clientSecret), spotifyauth.WithScopes(spotifyauth.ScopeUserReadCurrentlyPlaying, spotifyauth.ScopePlaylistReadPrivate))
 	ctx := context.TODO()
 
-	tByte, err := os.ReadFile("./refresh.token")
+	tByte, err := os.ReadFile(refreshToken)
 	if err != nil {
 		return nil, errors.Join(err, fmt.Errorf("cannot read refresh token file"))
 	}
@@ -35,6 +35,8 @@ func GetClient(clientID, clientSecret string) (*spotify.Client, error) {
 
 	token.RefreshToken = string(t)
 
+	fmt.Println(token.RefreshToken)
+
 	// use the token to get an authenticated client
 	client := spotify.New(auth.Client(ctx, token))
 
@@ -44,7 +46,7 @@ func GetClient(clientID, clientSecret string) (*spotify.Client, error) {
 		return nil, err
 	}
 
-	err = os.WriteFile("refresh.token", []byte(newToken.RefreshToken), 0644)
+	err = os.WriteFile(refreshToken, []byte(newToken.RefreshToken), 0644)
 	if err != nil {
 		return nil, err
 	}

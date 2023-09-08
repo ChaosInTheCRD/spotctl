@@ -20,17 +20,20 @@ var (
 )
 
 func main() {
+	flag.Parse()
+	log.Printf("refresh token path set to %s", *refreshTokenPath)
+	log.Printf("client ID set to %s", *clientID)
+	log.Printf("client Secret set to %s", *clientSecret)
 	http.HandleFunc("/status", statusHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func statusHandler(w http.ResponseWriter, r *http.Request) {
-	flag.Parse()
 	if *clientID == "" || *clientSecret == "" {
 		log.Printf("client ID and client secret not set correctly. Exiting...")
 		return
 	}
-	response, err := cli.GetCurrentTrack(*clientID, *clientSecret)
+	response, err := cli.GetCurrentTrack(*clientID, *clientSecret, *refreshTokenPath)
 	if err != nil {
 		log.Printf("Error getting spotify track: %s", err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

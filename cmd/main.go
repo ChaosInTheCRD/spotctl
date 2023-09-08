@@ -44,7 +44,7 @@ func getCommands() []*urcli.Command {
 			Name:  "status",
 			Usage: "status",
 			Action: func(cCtx *urcli.Context) error {
-				track, err := cli.GetCurrentTrack(os.Getenv("SPOTIFY_ID"), os.Getenv("SPOTIFY_SECRET"))
+				track, err := cli.GetCurrentTrack(os.Getenv("SPOTIFY_ID"), os.Getenv("SPOTIFY_SECRET"), "./refresh.token")
 				if err != nil {
 					return err
 				}
