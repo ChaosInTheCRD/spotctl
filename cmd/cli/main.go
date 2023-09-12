@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/chaosinthecrd/spotify-scraper/cli"
+	cmd "github.com/chaosinthecrd/spotify-scraper/cmd/cli/commands"
 	urcli "github.com/urfave/cli/v2"
 )
 
@@ -31,7 +31,7 @@ func getCommands() []*urcli.Command {
 				{
 					Name: "playlists",
 					Action: func(cCtx *urcli.Context) error {
-						err := cli.GetPlaylists()
+						err := cmd.GetPlaylists()
 						if err != nil {
 							return err
 						}
@@ -44,7 +44,7 @@ func getCommands() []*urcli.Command {
 			Name:  "status",
 			Usage: "status",
 			Action: func(cCtx *urcli.Context) error {
-				track, err := cli.GetCurrentTrack(os.Getenv("SPOTIFY_ID"), os.Getenv("SPOTIFY_SECRET"), "./refresh.token")
+				track, err := cmd.GetCurrentTrack(os.Getenv("SPOTIFY_ID"), os.Getenv("SPOTIFY_SECRET"), "./refresh.token")
 				if err != nil {
 					return err
 				}
@@ -57,7 +57,7 @@ func getCommands() []*urcli.Command {
 			Name:  "auth",
 			Usage: "auth",
 			Action: func(cCtx *urcli.Context) error {
-				err := cli.Authenticate()
+				err := cmd.Authenticate()
 				if err != nil {
 					return err
 				}
