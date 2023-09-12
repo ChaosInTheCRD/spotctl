@@ -1,4 +1,4 @@
-package server
+package main
 
 import (
 	"encoding/json"
@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	cli "github.com/chaosinthecrd/spotctl/cli/commands"
+	cli "github.com/chaosinthecrd/spotctl/cmd/cli/commands"
 )
 
 var (
