@@ -1,4 +1,5 @@
 ### *Note: This implementation is not totally secure. I am sure that using refresh tokens as they are below is an insecure practice, and I am aware of other insecurities in the code. However, this is for personal use and I am happy with the compromises that I have made to make this work. Please feel free to use the code at your leisure and if you want to make it more secure, contribute back!*
+### *Another Note: This code is hodge podge of calling environment variables and command-line flags. Sorry about that, I'll neaten things up at some point (maybe)*
 
 # spotctl
 This project was created because I wanted to create a way of displaying information on [my personal website](https://chaosinthe.dev) about the music I listen to using the [Spotify Web API](https://developer.spotify.com/documentation/web-api).
