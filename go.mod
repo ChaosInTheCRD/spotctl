@@ -1,4 +1,4 @@
-module github.com/chaosinthecrd/spotify-scraper
+module github.com/chaosinthecrd/spotctl
 
 go 1.18
 

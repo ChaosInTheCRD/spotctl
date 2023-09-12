@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/chaosinthecrd/spotify-scraper/internal"
+	"github.com/chaosinthecrd/spotctl/internal"
 	cv "github.com/nirasan/go-oauth-pkce-code-verifier"
 	spotify "github.com/zmb3/spotify/v2"
 	"golang.org/x/oauth2"

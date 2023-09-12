@@ -6,13 +6,13 @@ import (
 	"log"
 	"os"
 
-	cmd "github.com/chaosinthecrd/spotify-scraper/cmd/cli/commands"
+	cmd "github.com/chaosinthecrd/spotctl/cmd/cli/commands"
 	urcli "github.com/urfave/cli/v2"
 )
 
 func main() {
 	app := &urcli.App{
-		Name:     "spotify-scraper",
+		Name:     "spotctl",
 		Usage:    "Scraping the spotify API for important information",
 		Commands: getCommands(),
 	}

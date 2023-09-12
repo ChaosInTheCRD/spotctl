@@ -4,7 +4,7 @@ import (
 // "context"
 // "fmt"
 //
-// "github.com/chaosinthecrd/spotify-scraper/internal"
+// "github.com/chaosinthecrd/spotctl/internal"
 )
 
 func GetPlaylists() error {
