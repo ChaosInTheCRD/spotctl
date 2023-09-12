@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"encoding/json"
@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/chaosinthecrd/spotify-scraper/cli"
+	cli "github.com/chaosinthecrd/spotctl/cli/commands"
 )
 
 var (
