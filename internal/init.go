@@ -2,7 +2,6 @@ package internal
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -23,17 +22,10 @@ func GetClient(clientID, clientSecret, refreshToken string) (*spotify.Client, er
 	auth := spotifyauth.New(spotifyauth.WithRedirectURL(RedirectURI), spotifyauth.WithClientID(clientID), spotifyauth.WithClientSecret(clientSecret), spotifyauth.WithScopes(spotifyauth.ScopeUserReadCurrentlyPlaying, spotifyauth.ScopePlaylistReadPrivate))
 	ctx := context.TODO()
 
-	tByte, err := os.ReadFile(refreshToken)
-	if err != nil {
-		return nil, errors.Join(err, fmt.Errorf("cannot read refresh token file"))
-	}
-
-	t := string(tByte)
-
 	token := new(oauth2.Token)
 	token.Expiry = time.Now().Add(time.Second * -5)
 
-	token.RefreshToken = string(t)
+	token.RefreshToken = refreshToken
 
 	fmt.Println(token.RefreshToken)
 
@@ -46,10 +38,11 @@ func GetClient(clientID, clientSecret, refreshToken string) (*spotify.Client, er
 		return nil, err
 	}
 
-	err = os.WriteFile(refreshToken, []byte(newToken.RefreshToken), 0644)
+	err = os.Setenv("REFRESH_TOKEN", newToken.RefreshToken)
 	if err != nil {
 		return nil, err
 	}
+
 	return client, nil
 }
 

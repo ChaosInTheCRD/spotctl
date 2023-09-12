@@ -13,10 +13,10 @@ type Track struct {
 	PreviewURL string `json:"previewURL"`
 }
 
-func GetCurrentTrack(clientID, clientSecret, refreshTokenPath string) (Track, error) {
+func GetCurrentTrack(clientID, clientSecret, refreshToken string) (Track, error) {
 	ctx := context.Background()
 
-	client, err := internal.GetClient(clientID, clientSecret, refreshTokenPath)
+	client, err := internal.GetClient(clientID, clientSecret, refreshToken)
 	if err != nil {
 		return Track{}, err
 	}
