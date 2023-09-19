@@ -63,8 +63,9 @@ func refreshTrack() {
 	if rt == "" && *refreshToken != "" {
 		fmt.Println("using initial refresh token")
 		rt = *refreshToken
-	} else {
-		log.Printf("refreshToken not set correctly. Exiting...")
+	} else if rt == "" {
+		log.Panicf("refreshToken not set correctly. Exiting...")
+		return
 	}
 
 	currentSong, err = cli.GetCurrentTrack(*clientID, *clientSecret, rt)
@@ -72,6 +73,8 @@ func refreshTrack() {
 		log.Printf("Error getting spotify track: %s", err.Error())
 		return
 	}
+
+	log.Println("Found current song", currentSong.Name)
 }
 
 func statusHandler(w http.ResponseWriter, r *http.Request) {
