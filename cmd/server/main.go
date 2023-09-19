@@ -33,6 +33,7 @@ func main() {
 		for {
 			select {
 			case <-ticker.C:
+				log.Println("time is, refreshing track", time.Now())
 				refreshTrack()
 			case <-quit:
 				ticker.Stop()
@@ -63,9 +64,11 @@ func refreshTrack() {
 	if rt == "" && *refreshToken != "" {
 		fmt.Println("using initial refresh token")
 		rt = *refreshToken
-	} else if rt == "" {
-		log.Panicf("refreshToken not set correctly. Exiting...")
+	} else if rt != "" {
+		log.Panicf("using REFRESH_TOKEN env var")
 		return
+	} else {
+		log.Panicf("neither REFRESH_TOKEN env var nor cli flag set. Exiting...")
 	}
 
 	currentSong, err = cli.GetCurrentTrack(*clientID, *clientSecret, rt)
@@ -74,7 +77,7 @@ func refreshTrack() {
 		return
 	}
 
-	log.Println("Found current song", currentSong.Name)
+	log.Println("Found current song ", currentSong.Name, "; errors,", err.Error())
 }
 
 func statusHandler(w http.ResponseWriter, r *http.Request) {
