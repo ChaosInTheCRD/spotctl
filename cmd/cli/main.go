@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -44,8 +45,20 @@ func getCommands() []*urcli.Command {
 			Name:  "status",
 			Usage: "status",
 			Action: func(cCtx *urcli.Context) error {
-				track, err := cmd.GetCurrentTrack(os.Getenv("SPOTIFY_ID"), os.Getenv("SPOTIFY_SECRET"), "./refresh.token")
+				rt, err := os.ReadFile("./refresh.token")
 				if err != nil {
+					log.Fatalf(errors.Join(err, fmt.Errorf("could not read refresh token file")).Error())
+					return err
+				}
+				track, nrt, err := cmd.GetCurrentTrack(os.Getenv("SPOTIFY_ID"), os.Getenv("SPOTIFY_SECRET"), string(rt))
+				if err != nil {
+					log.Fatalf(errors.Join(err, fmt.Errorf("failed to get current track")).Error())
+					return err
+				}
+
+				err = os.WriteFile("./refresh.token", []byte(nrt), 0644)
+				if err != nil {
+					log.Fatalf(errors.Join(err, fmt.Errorf("failed to get current track")).Error())
 					return err
 				}
 				trackJSON, _ := json.Marshal(track)

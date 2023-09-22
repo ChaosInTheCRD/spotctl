@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -10,10 +11,15 @@ import (
 	"time"
 
 	cli "github.com/chaosinthecrd/spotctl/cmd/cli/commands"
+	internal "github.com/chaosinthecrd/spotctl/internal"
+)
+
+const (
+	projectID = "743756369742"
+	secretID  = "spotify"
 )
 
 var (
-	refreshToken = flag.String("refresh-token", "", "the refresh token to use at boot")
 	clientID     = flag.String("spotify-client-id", "", "the spotify client ID")
 	clientSecret = flag.String("spotify-client-secret", "", "the spotify client secret")
 	currentSong  = cli.Track{}
@@ -21,7 +27,6 @@ var (
 
 func main() {
 	flag.Parse()
-	log.Printf("refresh token path set to %s", *refreshToken)
 	log.Printf("client ID set to %s", *clientID)
 	log.Printf("client Secret set to %s", *clientSecret)
 
@@ -60,24 +65,29 @@ func refreshTrack() {
 		return
 	}
 
-	rt := os.Getenv("REFRESH_TOKEN")
-	if rt == "" && *refreshToken != "" {
-		fmt.Println("using initial refresh token")
-		rt = *refreshToken
-	} else if rt != "" {
-		log.Panicf("using REFRESH_TOKEN env var")
+	rt, err := internal.GetLatestSecret(projectID, secretID)
+	if err != nil {
+		err := errors.Join(err, fmt.Errorf("Failed to get refresh token from secrets manager"))
+		log.Fatalf(err.Error())
 		return
-	} else {
-		log.Panicf("neither REFRESH_TOKEN env var nor cli flag set. Exiting...")
 	}
 
-	currentSong, err = cli.GetCurrentTrack(*clientID, *clientSecret, rt)
+	currentSong, rt, err = cli.GetCurrentTrack(*clientID, *clientSecret, rt)
 	if err != nil {
 		log.Printf("Error getting spotify track: %s", err.Error())
 		return
 	}
 
-	log.Println("Found current song ", currentSong.Name, "; errors,", err.Error())
+	if rt != "" {
+		err = internal.UpdateSecret(projectID, secretID, rt)
+		if err != nil {
+			err := errors.Join(err, fmt.Errorf("failed to update secret"))
+			log.Fatalf(err.Error())
+			return
+		}
+	}
+
+	log.Println("Found current song ", currentSong.Name)
 }
 
 func statusHandler(w http.ResponseWriter, r *http.Request) {

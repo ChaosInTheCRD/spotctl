@@ -3,7 +3,6 @@ package internal
 import (
 	"context"
 	"fmt"
-	"os"
 	"os/exec"
 	"runtime"
 	"time"
@@ -18,7 +17,7 @@ const RedirectURI = "http://localhost:8080/callback"
 
 var Auth = spotifyauth.New(spotifyauth.WithRedirectURL(RedirectURI), spotifyauth.WithScopes(spotifyauth.ScopeUserReadCurrentlyPlaying, spotifyauth.ScopePlaylistReadPrivate))
 
-func GetClient(clientID, clientSecret, refreshToken string) (*spotify.Client, error) {
+func GetClient(clientID, clientSecret, refreshToken string) (*spotify.Client, string, error) {
 	auth := spotifyauth.New(spotifyauth.WithRedirectURL(RedirectURI), spotifyauth.WithClientID(clientID), spotifyauth.WithClientSecret(clientSecret), spotifyauth.WithScopes(spotifyauth.ScopeUserReadCurrentlyPlaying, spotifyauth.ScopePlaylistReadPrivate))
 	ctx := context.TODO()
 
@@ -35,15 +34,10 @@ func GetClient(clientID, clientSecret, refreshToken string) (*spotify.Client, er
 	// Need to set the new refresh token for the next request
 	newToken, err := client.Token()
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
-	err = os.Setenv("REFRESH_TOKEN", newToken.RefreshToken)
-	if err != nil {
-		return nil, err
-	}
-
-	return client, nil
+	return client, newToken.RefreshToken, nil
 }
 
 // open opens the specified URL in the default browser of the user.

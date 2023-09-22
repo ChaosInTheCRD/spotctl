@@ -13,23 +13,23 @@ type Track struct {
 	PreviewURL string `json:"previewURL"`
 }
 
-func GetCurrentTrack(clientID, clientSecret, refreshToken string) (Track, error) {
+func GetCurrentTrack(clientID, clientSecret, refreshToken string) (Track, string, error) {
 	ctx := context.Background()
 
-	client, err := internal.GetClient(clientID, clientSecret, refreshToken)
+	client, rt, err := internal.GetClient(clientID, clientSecret, refreshToken)
 	if err != nil {
-		return Track{}, err
+		return Track{}, "", err
 	}
 
 	currentlyPlaying, err := client.PlayerCurrentlyPlaying(ctx)
 	if err != nil {
-		return Track{}, err
+		return Track{}, rt, err
 	}
 
 	if !currentlyPlaying.Playing {
 		fmt.Println("null")
-		return Track{}, err
+		return Track{}, rt, nil
 	}
 
-	return Track{Name: currentlyPlaying.Item.Name, Artist: currentlyPlaying.Item.Artists[0].Name, PreviewURL: currentlyPlaying.Item.PreviewURL}, nil
+	return Track{Name: currentlyPlaying.Item.Name, Artist: currentlyPlaying.Item.Artists[0].Name, PreviewURL: currentlyPlaying.Item.PreviewURL}, rt, nil
 }
