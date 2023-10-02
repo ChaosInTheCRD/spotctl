@@ -38,7 +38,7 @@ func main() {
 		for {
 			select {
 			case <-ticker.C:
-				log.Println("time is, refreshing track", time.Now())
+				log.Println("time is", time.Now(), "refreshing track")
 				refreshTrack()
 			case <-quit:
 				ticker.Stop()

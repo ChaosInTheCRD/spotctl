@@ -31,5 +31,9 @@ func GetCurrentTrack(clientID, clientSecret, refreshToken string) (Track, string
 		return Track{}, rt, nil
 	}
 
-	return Track{Name: currentlyPlaying.Item.Name, Artist: currentlyPlaying.Item.Artists[0].Name, PreviewURL: currentlyPlaying.Item.PreviewURL}, rt, nil
+	if len(currentlyPlaying.Item.Artists) > 0 {
+		return Track{Name: currentlyPlaying.Item.Name, Artist: currentlyPlaying.Item.Artists[0].Name, PreviewURL: currentlyPlaying.Item.PreviewURL}, rt, nil
+	} else {
+		return Track{Name: currentlyPlaying.Item.Name, Artist: "", PreviewURL: currentlyPlaying.Item.PreviewURL}, rt, nil
+	}
 }
