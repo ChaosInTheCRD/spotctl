@@ -26,7 +26,7 @@ func GetCurrentTrack(clientID, clientSecret, refreshToken string) (Track, string
 		return Track{}, rt, err
 	}
 
-	if !currentlyPlaying.Playing {
+	if !currentlyPlaying.Playing || currentlyPlaying.Item == nil {
 		fmt.Println("null")
 		return Track{}, rt, nil
 	}
