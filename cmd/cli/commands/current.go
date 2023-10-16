@@ -19,6 +19,9 @@ func GetCurrentTrack(clientID, clientSecret, refreshToken string) (Track, string
 	client, rt, err := internal.GetClient(clientID, clientSecret, refreshToken)
 	if err != nil {
 		return Track{}, "", err
+	} else if client == nil {
+		fmt.Println("Got a 503... skipping this for now")
+		return Track{}, rt, nil
 	}
 
 	currentlyPlaying, err := client.PlayerCurrentlyPlaying(ctx)

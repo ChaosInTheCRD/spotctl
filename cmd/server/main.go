@@ -75,7 +75,6 @@ func refreshTrack() {
 	currentSong, rt, err = cli.GetCurrentTrack(*clientID, *clientSecret, rt)
 	if err != nil {
 		log.Printf("Error getting spotify track: %s", err.Error())
-		return
 	}
 
 	if rt != "" {
