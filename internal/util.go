@@ -1,12 +1,16 @@
 package internal
 
 import (
-	secretmanager "cloud.google.com/go/secretmanager/apiv1"
 	"context"
 	"fmt"
+	"time"
+
+	secretmanager "cloud.google.com/go/secretmanager/apiv1"
+
 	//"google.golang.org/api/iterator"
-	secretmanagerpb "cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
 	"math/rand"
+
+	secretmanagerpb "cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
 )
 
 func Generate(n int) string {
@@ -56,9 +60,17 @@ func UpdateSecret(projectID, secretID, value string) error {
 	}
 
 	// Call the API.
-	_, err = client.AddSecretVersion(ctx, areq)
-	if err != nil {
-		return fmt.Errorf("failed to add secret version: %v", err)
+	// Seems like it has been failing? I am going to try retries and see if that helps
+	for i := 0; i <= 10; i++ {
+		_, err = client.AddSecretVersion(ctx, areq)
+		if err == nil {
+			break
+		}
+		if i == 10 {
+			return fmt.Errorf("failed to add secret version: %v", err)
+		}
+
+		time.Sleep(10 * time.Second)
 	}
 
 	//fmt.Printf("added secret version: %s\n", result.Name)
